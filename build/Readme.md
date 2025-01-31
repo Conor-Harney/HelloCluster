@@ -70,7 +70,7 @@ kubectl -n ingress-nginx get po
 ```
 kubectl apply -f ./build/namespace.yml
 kubectl apply -f ./build/deployment.yml
-kubectl get po -n hello-cluster-namespace
+kubectl describe po -n hello-cluster-namespace
 ```
 
 # Exposing The App
