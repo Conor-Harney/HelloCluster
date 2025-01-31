@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  namespace: hello-cluster-namespace
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+       app: api-app-label
+  template:
+    metadata:
+      labels:
+        app: api-app-label
+    spec:
+      containers:
+        - name: app-container
+          image: hello-cluster-image:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 41010
