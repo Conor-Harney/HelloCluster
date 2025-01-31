@@ -1,0 +1,4 @@
+server:
+  port: 41010
+  servlet:
+    context-path: /api
