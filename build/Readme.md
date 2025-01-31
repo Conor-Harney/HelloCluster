@@ -3,6 +3,7 @@
 * [Table of Contents](#table-of-contents)
 * [Pre-requisites](#pre-requisites)
   * [Windows](#windows)
+  * [Maven](#maven)
   * [Docker](#docker)
   * [Kubectl](#kubectl)
   * [Minikube](#minikube)
@@ -25,6 +26,9 @@
 # Pre-requisites
 ## Windows
 The following is one simple Windows centric approach. Steps, particularly in relation to minikube tunnel, will differ on different systems. 
+
+## Maven
+To build the API you will need to run a clean install using Maven.
 
 ## Docker
 For local deployments, ensure docker desktop is installed and started
