@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db-deployment
+  namespace: hello-cluster-namespace
+spec:
+  serviceName: db-service
+  # Changing this number right now will end poorly for all involved.
+  # Postgres needs additional cluster settings before the stateful set can be scaled safely.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-db-label
+  template:
+    metadata:
+      labels:
+        app: app-db-label
+    spec:
+      containers:
+        - name: db
+          image: 'postgres:14'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: db-config
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: db_password
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: dbdata
+  volumeClaimTemplates:
+    - metadata:
+        name: dbdata
+        namespace: hello-cluster-namespace
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 10Gi

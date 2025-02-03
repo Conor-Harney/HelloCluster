@@ -12,6 +12,7 @@
   * [Create The Image From The Repo](#create-the-image-from-the-repo)
 * [Running On Kubernetes](#running-on-kubernetes)
   * [Set up the ingress controller](#set-up-the-ingress-controller)
+  * [Set up The Database](#set-up-the-database)
   * [Deploy The App](#deploy-the-app)
 * [Exposing The App](#exposing-the-app)
   * [Expose Through The Service](#expose-through-the-service)
@@ -21,6 +22,8 @@
 * [Troubleshooting](#troubleshooting)
   * [I need to start again](#i-need-to-start-again)
   * [Image not found](#image-not-found)
+  * [Testing Postgres Connection](#testing-postgres-connection)
+* [Quickstart](#quickstart)
 <!-- TOC -->
 
 # Pre-requisites
@@ -68,6 +71,15 @@ minikube addons enable ingress
 kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
 kubectl -n ingress-nginx get po
 ```
+
+## Set up The Database
+```
+kubectl apply -f ./build/database/configMap.yml
+kubectl apply -f ./build/database/secret.yml
+kubectl apply -f ./build/database/service.yml
+kubectl apply -f ./build/database/statefulSet.yml
+```
+
 
 ## Deploy The App
 
@@ -182,3 +194,70 @@ If you are using minikube context, and it is not picking up the image, you can c
 minikube image load hello-cluster-image:latest
 ```
 
+## Testing Postgres Connection
+You may wish to test connection to your postgress service. To do this, you can use a use the "postgresql-client" to check if the db is accepting connections.
+
+Select a pod to exec into to run the command from, eg the api pod:
+```
+kubectl get po -n hello-cluster-namespace
+kubectl exec -it app-deployment-7d4b4586cc-t44h8 -n hello-cluster-namespace -- sh
+```
+```
+PS C:\Workspace\repos\HelloCluster> kubectl get po -n hello-cluster-namespace                                        
+NAME                              READY   STATUS    RESTARTS   AGE
+app-deployment-7d4b4586cc-l6zmt   1/1     Running   0          87m
+app-deployment-7d4b4586cc-t44h8   1/1     Running   0          87m
+db-deployment-684d685dcd-q5z7z    1/1     Running   0          87m
+PS C:\Workspace\repos\HelloCluster> kubectl exec -it app-deployment-7d4b4586cc-t44h8 -n hello-cluster-namespace -- sh
+# 
+```
+
+Now install the client and run the "pg_isready" command
+```
+apt update
+apt install -y postgresql-client
+pg_isready -d <db_name> -h <service_name>.<namespace>.svc -p <db_port> -U <db_user>
+```
+
+```
+apt update
+apt install -y postgresql-client
+# pg_isready -d ps_db -h db-service.hello-cluster-namespace.svc -p 5432 -U ps_user
+db-service.hello-cluster-namespace.svc:5432 - accepting connections
+```
+
+## Out of date image
+```
+minikube image ls | findstr hello-cluster-image
+minikube image rm hello-cluster-image:latest
+minikube image load hello-cluster-image:latest
+```
+
+# Quickstart
+
+```
+minikube start
+kubectl config use-context minikube
+minikube addons enable ingress
+
+mvn clean install
+docker build -t hello-cluster-image:latest -f build/Dockerfile .
+minikube image load hello-cluster-image:latest
+
+kubectl delete namespace hello-cluster-namespace
+kubectl apply -f ./build/namespace.yml
+
+kubectl apply -f ./build/database/configMap.yml
+kubectl apply -f ./build/database/secret.yml
+kubectl apply -f ./build/database/service.yml
+kubectl apply -f ./build/database/statefulSet.yml
+
+kubectl apply -f ./build/deployment.yml
+kubectl apply -f ./build/service.yml
+kubectl apply -f ./build/ingress.yml
+
+minikube tunnel
+
+curl --resolve "hello-cluster.ie:80:127.0.0.1" -i http://hello-cluster.ie/api/hello
+curl --resolve "hello-cluster.ie:80:127.0.0.1" -i http://hello-cluster.ie/api/connections
+```

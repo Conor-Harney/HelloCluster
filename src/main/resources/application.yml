@@ -2,3 +2,15 @@ server:
   port: 41010
   servlet:
     context-path: /api
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  properties:
+    hibernate:
+      format_sql: true
+      dialect: org.hibernate.dialect.PostgreSQL81Dialect
+  datasource:
+    url: jdbc:postgresql://db-service.hello-cluster-namespace.svc/db
+    username: rw_user
+    password: notSoSecretPassword

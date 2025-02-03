@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+  namespace: hello-cluster-namespace
+  labels:
+    app: app-db-label
+spec:
+  clusterIP: None
+  ports:
+    - port: 5432
+  selector:
+    app: app-db-label

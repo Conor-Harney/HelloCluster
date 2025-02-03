@@ -9,9 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -20,7 +17,7 @@ public class HelloClusterControllerImpl implements HelloClusterController {
     private final HelloClusterService service;
 
     @Override
-    public ResponseEntity<GenericResponse> helloCluster(){
+    public ResponseEntity<GenericResponse> helloCluster() {
         GenericResponse genericResponse = new GenericResponse(service.getHelloClusterMessage());
         return new ResponseEntity<>(genericResponse, HttpStatus.OK);
     }

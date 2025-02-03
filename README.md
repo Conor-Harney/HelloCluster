@@ -1,6 +1,8 @@
 # HelloCluster
 ## Overview
-A demonstration of scaling an api through a Kubernetes cluster.
+A demonstration of scaling an api through a Kubernetes cluster. 
+
+This is not currently designed to also scale the database, as the replication settings have not been enabled. Database replication will come in future updates. 
 
 ## Build
 
